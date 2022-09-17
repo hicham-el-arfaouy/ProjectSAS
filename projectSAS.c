@@ -132,25 +132,25 @@ void menu(){
     int choice;
     
     do{
-        printf("\t -------------\n");
-        printf("\t|\tMENU\t|\n");
-        printf("\t -------------\n");
-        printf("\t|\t{1}\t:\tADD\t|\n");
-        printf("\t|\t{2}\t:\tsearch\t|\n");
-        printf("\t|\t{3}\t:\tdelete\t|\n");
-        printf("\t|\t{4}\t:\tshow\t|\n");
-        printf("\t|\t{0}\t:\tExit\t|\n");
-        printf("\t ------------------------------\t\n");
+        printf("\t -------------------------------------------------------\t\n");
+        printf("\t|\t\t\tMENU\t\t\t\t|\n");
+        printf("\t -------------------------------------------------------\t\n");
+        printf("\t|\t{ 1 }\t:\tShow Medicines\t\t\t|\n");
+        printf("\t|\t{ 2 }\t:\tAdd Medicines\t\t\t|\n");
+        printf("\t|\t{ 3 }\t:\tSearch for Medicine\t\t|\n");
+        printf("\t|\t{ 4 }\t:\tDelete Medicine\t\t\t|\n");
+        printf("\t|\t{ 0 }\t:\tExit\t\t\t\t|\n");
+        printf("\t -------------------------------------------------------\t\n");
         printf("Please enter your choice : ");
         scanf("%d", &choice);
         system("cls");
         switch(choice){
             case 0: break;
-            case 1: addProduct(); break;
-            case 2: searchProduct(); break;
-            case 3: deleteProduct(); break;
-            case 4: showProduct(); break;
-            default : printf("\t-------> Please enter valid Number!!! <-------\n");
+            case 1: showProduct(); break;
+            case 2: addProduct(); break;
+            case 3: searchProduct(); break;
+            case 4: deleteProduct(); break;
+            default : printf("\n\t\t===> PLEASE ENTER VALID NUMBER!!! <===\n\n");
         }
     }while(choice != 0);
 }
