@@ -22,12 +22,12 @@ struct Medicine medicineArray[100] = {
         {36, "aspirine", 2, 22.99},
         {45, "huawei", 6, 25.99},
         {5, "setamix", 4, 25.99},
-        {2, "dwa rass", 0, 35.99},
+        {2, "dwa rass", 0, 3335.99},
     };
 
 
 // Functions
-void addProduct(){
+void addMedicine(){
     int numbers;
     printf("Please enter the numbers of products : ");
     scanf("%d", &numbers);
@@ -46,7 +46,7 @@ void addProduct(){
         ++lentghArray;
     }
 }
-int searchProduct(){
+int searchMedicine(){
     int choiceSearchDelete;
     printf("Would you like to search with NAME or ID \n");
     printf("[1] ===>> Search  with Name \n");
@@ -79,47 +79,65 @@ int searchProduct(){
     }
     return -1;
 }
-void showProduct(){
-    int sortAlphaPrix;
+void sortByAlphabet(){
     struct Medicine help;
 
-    printf("Would you like to sort with Alphabetical or Prix \n");
-    printf("[1] ===>> Sort  with Alphabetical \n");
-    printf("[2] ===>> Sort with Prix \n");
-    scanf("%d", &sortAlphaPrix);
-
-    if(sortAlphaPrix == 1){
-        for(int i = 0; i < lentghArray; i++){
-            for(int j = i + 1; j < lentghArray; j++){
-                if(strcmp(medicineArray[i].name, medicineArray[j].name) > 0 ){
-                    help = medicineArray[i];
-                    medicineArray[i] = medicineArray[j];
-                    medicineArray[j] = help;
-                }
-            }
-        }
-    }else{
-        for(int i = 0; i < lentghArray; i++){
-            for(int j = i + 1; j < lentghArray; j++){
-                if(medicineArray[i].prix < medicineArray[j].prix){
-                    help = medicineArray[i];
-                    medicineArray[i] = medicineArray[j];
-                    medicineArray[j] = help;
-                }
-            }
-        }
-    }
- 
-    printf("\t ----------\t----------\t----------\t----------\n");
-    printf("\t|   name   |\t|    id    |\t|  amount  |\t|   prix   |\n");
-    printf("\t ----------\t----------\t----------\t----------\n");
-
     for(int i = 0; i < lentghArray; i++){
-        printf("\t%s           \t%d           \t%d         \t%.2f\n", medicineArray[i].name, medicineArray[i].id, medicineArray[i].amount, medicineArray[i].prix);
+        for(int j = i + 1; j < lentghArray; j++){
+            if(strcmp(medicineArray[i].name, medicineArray[j].name) > 0 ){
+                help = medicineArray[i];
+                medicineArray[i] = medicineArray[j];
+                medicineArray[j] = help;
+            }
+        }
     }
 }
-void deleteProduct(){
-    int i , index = searchProduct();
+void sortByPrice(){
+    struct Medicine help;
+
+    for(int i = 0; i < lentghArray; i++){
+        for(int j = i + 1; j < lentghArray; j++){
+            if(medicineArray[i].prix < medicineArray[j].prix){
+                help = medicineArray[i];
+                medicineArray[i] = medicineArray[j];
+                medicineArray[j] = help;
+            }
+        }
+    }
+}
+void showListMedicines(){
+    printf("\t -----------------------------------------------------------------------------------------------\n");
+    printf("\t|\tMedicine ID\t|\tMedicine Name\t|\tMedicine Amount\t|\tMedicine Price\t|\n");
+    printf("\t -----------------------------------------------------------------------------------------------\n");
+
+    for(int i = 0; i < lentghArray; i++){
+        printf("\t|\t%d\t\t|\t%s    \t|\t%d\t\t|\t%.2f   DH\t|\n", medicineArray[i].id, medicineArray[i].name, medicineArray[i].amount, medicineArray[i].prix);
+    }
+
+    printf("\t -----------------------------------------------------------------------------------------------\n\n\n\n");
+}
+int showMedicines(){
+    int sortChoice;
+
+    do{
+        printf("[1] ===> Sort with Alphabet \n");
+        printf("[2] ===> Sort with Price \n");
+        printf("[0] ===> Return to Menu \n");
+        printf("Would you like to sort with Alphabet or Price : ");
+        scanf("%d", &sortChoice);
+        system("cls");
+        switch(sortChoice){
+            case 0: return 0;
+            case 1: sortByAlphabet(); break;
+            case 2: sortByPrice(); break;
+            default : printf("\n\t\t===> PLEASE ENTER VALID CHOICE!!! <===\n\n");
+        }
+    }while(sortChoice < 0 || sortChoice > 2);
+ 
+    showListMedicines();
+}
+void deleteMedicine(){
+    int i , index = searchMedicine();
     if(index != -1){
         for(i = index; i < lentghArray; i++){
             medicineArray[i] = medicineArray[i + 1];
@@ -128,6 +146,8 @@ void deleteProduct(){
         --lentghArray;
     }
 }
+
+
 void menu(){
     int choice;
     
@@ -146,17 +166,16 @@ void menu(){
         system("cls");
         switch(choice){
             case 0: break;
-            case 1: showProduct(); break;
-            case 2: addProduct(); break;
-            case 3: searchProduct(); break;
-            case 4: deleteProduct(); break;
-            default : printf("\n\t\t===> PLEASE ENTER VALID NUMBER!!! <===\n\n");
+            case 1: showMedicines(); break;
+            case 2: addMedicine(); break;
+            case 3: searchMedicine(); break;
+            case 4: deleteMedicine(); break;
+            default : printf("\n\t\t===> PLEASE ENTER VALID CHOICE!!! <===\n\n");
         }
     }while(choice != 0);
 }
 
 
 void main(){
-
     menu();
 }
