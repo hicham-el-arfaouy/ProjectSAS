@@ -28,17 +28,79 @@ struct Transaction{
 float totalPrice = 0, totalProducts = 0;
 int max = -1, min = -1;
 int lengthTransactionArray = 0;
-int lengthArray = 7;
+int lengthArray = 0;
 struct Transaction transactionArray[100];
-struct Medicine medicineArray[100] = {
-        {11, "DOLIPRANE", 4, 25.99},
-        {34, "PARASITAMOL", 1, 20.99},
-        {33, "ASPRO", 1, 20.99},
-        {36, "ASPIRINE", 2, 22.99},
-        {45, "HUAWEI", 6, 25.99},
-        {5, "SETAMIX", 4, 25.99},
-        {2, "DWA RASS", 5, 3335.99},
-};
+struct Medicine medicineArray[100];
+
+
+// Files
+void medicineArrayToFile(){
+    FILE* file = NULL;
+
+    file = fopen("Medicines.txt", "w");
+    if (file != NULL){
+        for(int i = 0; i < lengthArray; i++){
+            fprintf(file, "%d\t%s\t\t\t%d\t%.2f\n", medicineArray[i].id, medicineArray[i].name, medicineArray[i].amount, medicineArray[i].price); 
+        }
+    }else{
+        printf("\t -----------------------------------------------------------------------------------------------\n");
+        printf("\t\t\t\t\tNo such file.\t\t\t\t\t\n");
+        printf("\t -----------------------------------------------------------------------------------------------\n\n\n\n");
+    }
+    
+    fclose(file); 
+}
+
+void transactionArrayToFile(){
+    FILE* file = NULL;
+
+    file = fopen("Transactions.txt", "w");
+    if (file != NULL){
+        for(int i = 0; i < lengthTransactionArray; i++){
+            fprintf(file, "%d\t%s\t\t%d\t%.2f\t%s", transactionArray[i].idMedicine, transactionArray[i].nameMedicine, transactionArray[i].amountMedicineBuying, transactionArray[i].priceMedicineBuying, transactionArray[i].buyTime); 
+        }
+    }else{
+        printf("\t -----------------------------------------------------------------------------------------------\n");
+        printf("\t\t\t\t\tNo such file.\t\t\t\t\t\n");
+        printf("\t -----------------------------------------------------------------------------------------------\n\n\n\n");
+    }
+    
+    fclose(file); 
+}
+
+void readMedicineArray(){
+    FILE* file = NULL;
+
+    file = fopen("Medicines.txt", "r");
+    if (file != NULL){
+        while(fscanf(file, "%d\t%s\t\t\t%d\t%f", &medicineArray[lengthArray].id, &medicineArray[lengthArray].name, &medicineArray[lengthArray].amount, &medicineArray[lengthArray].price) != -1){
+            lengthArray++;
+        }
+    }else{
+        printf("\t -----------------------------------------------------------------------------------------------\n");
+        printf("\t\t\t\t\tNo such file.\t\t\t\t\t\n");
+        printf("\t -----------------------------------------------------------------------------------------------\n\n\n\n");
+    }
+    
+    fclose(file); 
+}
+
+void readTransactionArray(){
+    FILE* file = NULL;
+
+    file = fopen("Transactions.txt", "r");
+    if (file != NULL){
+        while(fscanf(file, "%d\t%s\t\t%d\t%f\t%s", &transactionArray[lengthTransactionArray].idMedicine, &transactionArray[lengthTransactionArray].nameMedicine, &transactionArray[lengthTransactionArray].amountMedicineBuying, &transactionArray[lengthTransactionArray].priceMedicineBuying, &transactionArray[lengthTransactionArray].buyTime) != -1){
+            lengthTransactionArray++;
+        }
+    }else{
+        printf("\t -----------------------------------------------------------------------------------------------\n");
+        printf("\t\t\t\t\tNo such file.\t\t\t\t\t\n");
+        printf("\t -----------------------------------------------------------------------------------------------\n\n\n\n");
+    }
+    
+    fclose(file); 
+}
 
 
 // Functions
@@ -183,6 +245,8 @@ int addMedicine(){
 
             medicineArray[lengthArray] = medicine;
             ++lengthArray;
+
+            medicineArrayToFile();
         }
     }
 
@@ -244,6 +308,8 @@ int deleteMedicine(){
             medicineArray[i] = medicineArray[i + 1];
         }
         --lengthArray;
+
+        medicineArrayToFile();
     }else{
         printf("\t -----------------------------------------------------------------------------------------------\n");
         printf("\t\t\t\t\tSorry! We don't have this Medicine.\t\t\t\t\t\n");
@@ -271,6 +337,8 @@ int updateMedicine(){
         scanf("%d", &updateAmount);
         if(updateAmount > 0){
             medicineArray[index].amount += updateAmount;
+
+            medicineArrayToFile();
         }else{
             printf("\t -----------------------------------------------------------------------------------------------\n");
             printf("\t\t\t\t\tDon't Play with Me !!!.\t\t\t\t\t\n");
@@ -282,8 +350,10 @@ int updateMedicine(){
         printf("\t -----------------------------------------------------------------------------------------------\n\n\n\n");
     }
 }
+
 int buyMedicine(){
     int buyId, buyAmount, index;
+    char date[50];
 
     showListMedicines(false);
 
@@ -327,10 +397,18 @@ int buyMedicine(){
             transaction.amountMedicineBuying = buyAmount;
             transaction.priceMedicineBuying = (medicineArray[index].price * buyAmount);
             time_t  t = time(NULL);
-            strcpy(transaction.buyTime , ctime(&t));
+            strcpy(date, ctime(&t));
+            date[3] = '_';
+            date[7] = '_';
+            date[10] = '_';
+            date[19] = '_';
+            strcpy(transaction.buyTime , date);
             transactionArray[lengthTransactionArray] = transaction;
             lengthTransactionArray++;
             system("cls");
+
+            medicineArrayToFile();
+            transactionArrayToFile();
         }
     }else{
         printf("\t -----------------------------------------------------------------------------------------------\n");
@@ -394,5 +472,7 @@ void menu(){
 }
 
 void main(){
+    readMedicineArray();
+    readTransactionArray();
     menu();
 }

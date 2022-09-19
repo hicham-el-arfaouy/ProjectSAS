@@ -1,8 +1,8 @@
-11	doliprane    		4	25.99
-34	parasitamol    		1	20.99
-33	aspro    		1	20.99
-36	aspirine    		2	22.99
-45	huawei    		6	25.99
-5	setamix    		4	25.99
-2	dwa rass    		0	35.99
-2	12345678901    		0	35.99
+11	doliprane			4	25.99
+34	parasitamol			1	20.99
+33	aspro			1	20.99
+36	aspirine			2	22.99
+45	huawei			6	25.99
+5	setamix			4	25.99
+2	dwa:R_ass			0	35.99
+2	12345678901			0	35.99
