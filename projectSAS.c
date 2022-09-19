@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <math.h>
 #include <string.h> 
+#include <ctype.h>
+#include <time.h>
 
 
 // Structures Area
@@ -13,19 +15,29 @@ struct Medicine{
     float price;
 };
 
+struct Transaction{
+    int idMedicine;
+    char nameMedicine[20];
+    int amountMedicineBuying;
+    float priceMedicineBuying;
+    char buyTime[50];
+};
+
 
 // Global Variables
 float totalPrice = 0, totalProducts = 0;
 int max = -1, min = -1;
-int lentghArray = 7;
+int lengthTransactionArray = 0;
+int lengthArray = 7;
+struct Transaction transactionArray[100];
 struct Medicine medicineArray[100] = {
-        {11, "doliprane", 4, 25.99},
-        {34, "parasitamol", 1, 20.99},
-        {33, "aspro", 1, 20.99},
-        {36, "aspirine", 2, 22.99},
-        {45, "huawei", 6, 25.99},
-        {5, "setamix", 4, 25.99},
-        {2, "dwa rass", 0, 3335.99},
+        {11, "DOLIPRANE", 4, 25.99},
+        {34, "PARASITAMOL", 1, 20.99},
+        {33, "ASPRO", 1, 20.99},
+        {36, "ASPIRINE", 2, 22.99},
+        {45, "HUAWEI", 6, 25.99},
+        {5, "SETAMIX", 4, 25.99},
+        {2, "DWA RASS", 5, 3335.99},
 };
 
 
@@ -33,8 +45,8 @@ struct Medicine medicineArray[100] = {
 void sortByAlphabet(){
     struct Medicine help;
 
-    for(int i = 0; i < lentghArray; i++){
-        for(int j = i + 1; j < lentghArray; j++){
+    for(int i = 0; i < lengthArray; i++){
+        for(int j = i + 1; j < lengthArray; j++){
             if(strcmp(medicineArray[i].name, medicineArray[j].name) > 0 ){
                 help = medicineArray[i];
                 medicineArray[i] = medicineArray[j];
@@ -47,14 +59,20 @@ void sortByAlphabet(){
 void sortByPrice(){
     struct Medicine help;
 
-    for(int i = 0; i < lentghArray; i++){
-        for(int j = i + 1; j < lentghArray; j++){
+    for(int i = 0; i < lengthArray; i++){
+        for(int j = i + 1; j < lengthArray; j++){
             if(medicineArray[i].price < medicineArray[j].price){
                 help = medicineArray[i];
                 medicineArray[i] = medicineArray[j];
                 medicineArray[j] = help;
             }
         }
+    }
+}
+
+void toUpperCase(char string[20]){
+    for(int i = 0; i < strlen(string); i++){
+        string[i] = toupper(string[i]);
     }
 }
 
@@ -71,7 +89,7 @@ void showListMedicines(bool fromUpdate){
     printf("\t|\tMedicine ID\t|\tMedicine Name\t|\tMedicine Amount\t|\tMedicine Price\t|\n");
     printf("\t -----------------------------------------------------------------------------------------------\n");
 
-    for(int i = 0; i < lentghArray; i++){
+    for(int i = 0; i < lengthArray; i++){
         if(fromUpdate){
             if(medicineArray[i].amount < 3){
                 printf("\t|\t%d\t\t|\t%s    \t|\t%d\t\t|\t%.2f   DH\t|\n", medicineArray[i].id, medicineArray[i].name, medicineArray[i].amount, medicineArray[i].price);
@@ -107,36 +125,8 @@ int showMedicines(){
     showListMedicines(false);
 }
 
-int addMedicine(){
-    int numbers;
-    printf("[0] ===> Return to Menu \n");
-    printf("How many medicine do you want add : ");
-    scanf("%d", &numbers);
-    if(numbers <= 0){
-        system("cls");
-        return 0;
-    }
-    for(int i = 0; i < numbers; i++){
-        struct Medicine medicine;
-        printf("--------------[ %d ]--------------\n", i + 1);
-        printf("Medicine ID : ");
-        scanf("%d", &medicine.id);
-        printf("Medicine Name : ");
-        scanf("%s", &medicine.name);
-        printf("Medicine Amount : ");
-        scanf("%d", &medicine.amount);
-        printf("Medicine Price : ");
-        scanf("%f", &medicine.price);
-
-        medicineArray[lentghArray] = medicine;
-        ++lentghArray;
-    }
-
-    showListMedicines(false);
-}
-
 int isExistById(int id){
-    for(int i = 0; i < lentghArray; i++){
+    for(int i = 0; i < lengthArray; i++){
         if(id == medicineArray[i].id){
             showSingleMedicine(medicineArray[i]);
             return i;
@@ -147,7 +137,8 @@ int isExistById(int id){
 }
 
 int isExistByName(char name[20]){
-    for(int i = 0; i < lentghArray; i++){
+    toUpperCase(name);
+    for(int i = 0; i < lengthArray; i++){
         if(strcmp(name, medicineArray[i].name) == 0){
             showSingleMedicine(medicineArray[i]);
             return i;
@@ -155,6 +146,47 @@ int isExistByName(char name[20]){
     }
 
     return -1;
+}
+
+int addMedicine(){
+    int numbers;
+    printf("[0] ===> Return to Menu \n");
+    printf("How many medicine do you want add : ");
+    scanf("%d", &numbers);
+    if(numbers <= 0){
+        system("cls");
+        return 0;
+    }
+
+    wrongId:
+
+    for(int i = 0; i < numbers; i++){
+        struct Medicine medicine;
+        printf("--------------[ %d ]--------------\n", i + 1);
+        printf("Medicine ID : ");
+        scanf("%d", &medicine.id);
+
+        if(isExistById(medicine.id) != -1){
+            printf("\t -----------------------------------------------------------------------------------------------\n");
+            printf("\t\t\t\t\tAlready Exist!!!.\t\t\t\t\t\n");
+            printf("\t -----------------------------------------------------------------------------------------------\n\n\n\n");
+            goto wrongId;
+        }else{
+            printf("Medicine Name : ");
+            scanf("%s", &medicine.name);
+            toUpperCase(medicine.name);
+            printf("Medicine Amount : ");
+            scanf("%d", &medicine.amount);
+            printf("Medicine Price : ");
+            scanf("%f", &medicine.price);
+            medicine.price += (medicine.price * 0.15);
+
+            medicineArray[lengthArray] = medicine;
+            ++lengthArray;
+        }
+    }
+
+    showListMedicines(false);
 }
 
 void searchMedicine(){
@@ -208,10 +240,10 @@ int deleteMedicine(){
     index = isExistById(deleteId);
 
     if(index != -1){
-        for(int i = index; i < lentghArray; i++){
+        for(int i = index; i < lengthArray; i++){
             medicineArray[i] = medicineArray[i + 1];
         }
-        --lentghArray;
+        --lengthArray;
     }else{
         printf("\t -----------------------------------------------------------------------------------------------\n");
         printf("\t\t\t\t\tSorry! We don't have this Medicine.\t\t\t\t\t\n");
@@ -287,6 +319,17 @@ int buyMedicine(){
             totalPrice += (medicineArray[index].price * buyAmount);
             totalProducts += buyAmount;
             medicineArray[index].amount -= buyAmount;
+
+            // Add to transaction Array
+            struct Transaction transaction;
+            transaction.idMedicine = medicineArray[index].id;
+            strcpy(transaction.nameMedicine , medicineArray[index].name);
+            transaction.amountMedicineBuying = buyAmount;
+            transaction.priceMedicineBuying = (medicineArray[index].price * buyAmount);
+            time_t  t = time(NULL);
+            strcpy(transaction.buyTime , ctime(&t));
+            transactionArray[lengthTransactionArray] = transaction;
+            lengthTransactionArray++;
             system("cls");
         }
     }else{
@@ -298,17 +341,27 @@ int buyMedicine(){
 
 void dashboard(){
     float moyen = totalProducts != 0 ? (totalPrice / totalProducts) : 0;
-
+    system("cls");
     printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
     printf("\t|\tSum Medicine Sold\t|\tMoyen Medicine Sold\t|\tMax Medicine Sold\t|\tMin Medicine Sold\t|\n");
     printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
     printf("\t|\t%.2f   DH\t\t|\t%.2f   DH\t\t|\t%.2f   DH\t\t|\t%.2f   DH\t\t|\n", totalPrice, moyen, medicineArray[max].price, medicineArray[min].price);
     printf("\t ---------------------------------------------------------------|\t%s\t\t|\t%s\t\t|\n", medicineArray[max].name, medicineArray[min].name);
     printf("\t                                                                 ---------------------------------------------------------------\n\n\n");
+
+    printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
+    printf("\t|\tN\t|\tID\t|\tMedicine Name\t|\tAmount\t|\tPrice Total\t|\tTransaction Date\t|\n");
+    printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
+
+    for(int i = 0; i < lengthTransactionArray; i++){
+        printf("\t|\t%d\t|\t%d\t|\t%s    \t|\t%d\t|\t%.2f   DH\t|  %s\n", i + 1, transactionArray[i].idMedicine, transactionArray[i].nameMedicine, transactionArray[i].amountMedicineBuying, transactionArray[i].priceMedicineBuying, transactionArray[i].buyTime);
+    }
+
+    printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
 }
 
 void menu(){
-    int choice;
+    char choice[20];
     
     do{
         printf("\t -------------------------------------------------------\t\n");
@@ -324,9 +377,9 @@ void menu(){
         printf("\t|\t{ 0 }\t:\tExit\t\t\t\t|\n");
         printf("\t -------------------------------------------------------\t\n");
         printf("Please enter your choice : ");
-        scanf("%d", &choice);
+        scanf("%s", &choice);
         system("cls");
-        switch(choice){
+        switch(atoi(choice)){
             case 0: break;
             case 1: showMedicines(); break;
             case 2: addMedicine(); break;
@@ -337,7 +390,7 @@ void menu(){
             case 7: dashboard(); break;
             default : printf("\n\t\t===> PLEASE ENTER VALID CHOICE!!! <===\n\n");
         }
-    }while(choice != 0);
+    }while(atoi(choice) != 0);
 }
 
 void main(){
