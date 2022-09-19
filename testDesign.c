@@ -23,16 +23,25 @@ struct Medicine medicineArray[100] = {
 void main(){
 
 
-    printf("\t -----------------------------------------------------------------------------------------------\n");
-    printf("\t|\tMedicine ID\t|\tMedicine Name\t\t|\tMedicine Amount\t|\tMedicine Prix\t|\n");
-    printf("\t -----------------------------------------------------------------------------------------------\n");
+    // float moyen = totalProducts != 0 ? ((float)totalPrix / (float)totalProducts) : 0;
+    printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
+    printf("\t|\tSum Medicine Sold\t|\tMoyen Medicine Sold\t|\tMax Medicine Sold\t|\tMin Medicine Sold\t|\n");
+    printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
+    printf("\t|\t%.2f   DH\t\t|\t%.2f   DH\t\t|\t%.2f   DH\t\t|\t%.2f   DH\t\t|\n", 33, 33, 33, 22);
+    printf("\t ---------------------------------------------------------------|\t%s        \t\t|\t%s\t\t|\n", "", "");
+    printf("\t                                                                 ---------------------------------------------------------------\n");
+    printf("------------ the sum price of all products : %d\n", 77);
+    printf("------------ the moyen price of all products : %.2f\n", 44);
+    printf("------------ the min of all products : %s\n", medicineArray[0].name);
+    printf("------------ the max of all products : %s\n", medicineArray[0].name);
 
-    for(int i = 0; i < lentghArray; i++){
-        printf("\t|\t%d\t\t|\t%s    \t\t|\t%d\t\t|\t%.2f\t\t|\n", medicineArray[i].id, medicineArray[i].name, medicineArray[i].amount, medicineArray[i].prix);
-    }
+    // printf("\t ----------\t----------\t----------\t----------\n");
+    // printf("\t|   name   |\t|    id    |\t|  amount  |\t|   prix   |\t|   date   |\n");
+    // printf("\t ----------\t----------\t----------\t----------\n");
 
-    printf("\t -----------------------------------------------------------------------------------------------\n");
-
+    // for(int i = 0; i < lentghArrayTransaction; i++){
+    //     printf("\t%s           \t%d           \t%d         \t%.2f           \t%s\n", transactionArray[i].nameProduct, transactionArray[i].idProduct, transactionArray[i].amountProductBuying, transactionArray[i].prixProductBuying, transactionArray[i].buyTime);
+    // }
 
 
 
