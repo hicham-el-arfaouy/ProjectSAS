@@ -6,29 +6,34 @@
 #include <ctype.h>
 #include <time.h>
 
+#define LENGTH_NAME 50
+
 
 // Structures Area
 struct Medicine{
     int id;
-    char name[20];
+    char name[LENGTH_NAME];
     int amount;
     float price;
 };
 
 struct Transaction{
     int idMedicine;
-    char nameMedicine[20];
+    char nameMedicine[LENGTH_NAME];
     int amountMedicineBuying;
+    float unitPriceMedicine;
     float priceMedicineBuying;
     char buyTime[50];
+    char timeToCompare[50];
 };
 
 
 // Global Variables
 float totalPrice = 0, totalProducts = 0;
-int max = -1, min = -1;
+struct Transaction max;
+struct Transaction min;
 int lengthTransactionArray = 0;
-int lengthArray = 0;
+int lengthMedicineArray = 0;
 struct Transaction transactionArray[100];
 struct Medicine medicineArray[100];
 
@@ -39,7 +44,7 @@ void medicineArrayToFile(){
 
     file = fopen("Medicines.txt", "w");
     if (file != NULL){
-        for(int i = 0; i < lengthArray; i++){
+        for(int i = 0; i < lengthMedicineArray; i++){
             fprintf(file, "%d\t%s\t\t\t%d\t%.2f\n", medicineArray[i].id, medicineArray[i].name, medicineArray[i].amount, medicineArray[i].price); 
         }
     }else{
@@ -57,7 +62,7 @@ void transactionArrayToFile(){
     file = fopen("Transactions.txt", "w");
     if (file != NULL){
         for(int i = 0; i < lengthTransactionArray; i++){
-            fprintf(file, "%d\t%s\t\t%d\t%.2f\t%s", transactionArray[i].idMedicine, transactionArray[i].nameMedicine, transactionArray[i].amountMedicineBuying, transactionArray[i].priceMedicineBuying, transactionArray[i].buyTime); 
+            fprintf(file, "%d\t%s\t\t%d\t%.2f\t%.2f\t%s %s\n", transactionArray[i].idMedicine, transactionArray[i].nameMedicine, transactionArray[i].amountMedicineBuying, transactionArray[i].unitPriceMedicine,transactionArray[i].priceMedicineBuying, transactionArray[i].timeToCompare, transactionArray[i].buyTime); 
         }
     }else{
         printf("\t -----------------------------------------------------------------------------------------------\n");
@@ -73,8 +78,8 @@ void readMedicineArray(){
 
     file = fopen("Medicines.txt", "r");
     if (file != NULL){
-        while(fscanf(file, "%d\t%s\t\t\t%d\t%f", &medicineArray[lengthArray].id, &medicineArray[lengthArray].name, &medicineArray[lengthArray].amount, &medicineArray[lengthArray].price) != -1){
-            lengthArray++;
+        while(fscanf(file, "%d\t%s\t\t\t%d\t%f", &medicineArray[lengthMedicineArray].id, &medicineArray[lengthMedicineArray].name, &medicineArray[lengthMedicineArray].amount, &medicineArray[lengthMedicineArray].price) != -1){
+            lengthMedicineArray++;
         }
     }else{
         printf("\t -----------------------------------------------------------------------------------------------\n");
@@ -86,12 +91,31 @@ void readMedicineArray(){
 }
 
 void readTransactionArray(){
+    char date[50];
+    min.unitPriceMedicine = 9*9*9*9;
+
+    struct tm * buyTime;
+    time_t  t;
+    time(&t);
+    buyTime = localtime(&t);
+    strftime(date, 80, "%x", buyTime);
+
     FILE* file = NULL;
 
     file = fopen("Transactions.txt", "r");
     if (file != NULL){
-        while(fscanf(file, "%d\t%s\t\t%d\t%f\t%s", &transactionArray[lengthTransactionArray].idMedicine, &transactionArray[lengthTransactionArray].nameMedicine, &transactionArray[lengthTransactionArray].amountMedicineBuying, &transactionArray[lengthTransactionArray].priceMedicineBuying, &transactionArray[lengthTransactionArray].buyTime) != -1){
-            lengthTransactionArray++;
+        while(fscanf(file, "%d\t%s\t\t%d\t%f\t%f\t%s %[^\n]", &transactionArray[lengthTransactionArray].idMedicine, &transactionArray[lengthTransactionArray].nameMedicine, &transactionArray[lengthTransactionArray].amountMedicineBuying, &transactionArray[lengthTransactionArray].unitPriceMedicine, &transactionArray[lengthTransactionArray].priceMedicineBuying, &transactionArray[lengthTransactionArray].timeToCompare, &transactionArray[lengthTransactionArray].buyTime) != -1){
+            if(strcmp(transactionArray[lengthTransactionArray].timeToCompare, date) == 0){
+                if(max.unitPriceMedicine < transactionArray[lengthTransactionArray].unitPriceMedicine){
+                    max = transactionArray[lengthTransactionArray];
+                }
+                if(min.unitPriceMedicine > transactionArray[lengthTransactionArray].unitPriceMedicine){
+                    min = transactionArray[lengthTransactionArray];
+                }
+                totalPrice += transactionArray[lengthTransactionArray].priceMedicineBuying;
+                totalProducts += transactionArray[lengthTransactionArray].amountMedicineBuying;
+                lengthTransactionArray++;
+            }
         }
     }else{
         printf("\t -----------------------------------------------------------------------------------------------\n");
@@ -107,8 +131,8 @@ void readTransactionArray(){
 void sortByAlphabet(){
     struct Medicine help;
 
-    for(int i = 0; i < lengthArray; i++){
-        for(int j = i + 1; j < lengthArray; j++){
+    for(int i = 0; i < lengthMedicineArray; i++){
+        for(int j = i + 1; j < lengthMedicineArray; j++){
             if(strcmp(medicineArray[i].name, medicineArray[j].name) > 0 ){
                 help = medicineArray[i];
                 medicineArray[i] = medicineArray[j];
@@ -121,8 +145,8 @@ void sortByAlphabet(){
 void sortByPrice(){
     struct Medicine help;
 
-    for(int i = 0; i < lengthArray; i++){
-        for(int j = i + 1; j < lengthArray; j++){
+    for(int i = 0; i < lengthMedicineArray; i++){
+        for(int j = i + 1; j < lengthMedicineArray; j++){
             if(medicineArray[i].price < medicineArray[j].price){
                 help = medicineArray[i];
                 medicineArray[i] = medicineArray[j];
@@ -132,7 +156,7 @@ void sortByPrice(){
     }
 }
 
-void toUpperCase(char string[20]){
+void toUpperCase(char string[LENGTH_NAME]){
     for(int i = 0; i < strlen(string); i++){
         string[i] = toupper(string[i]);
     }
@@ -151,7 +175,7 @@ void showListMedicines(bool fromUpdate){
     printf("\t|\tMedicine ID\t|\tMedicine Name\t|\tMedicine Amount\t|\tMedicine Price\t|\n");
     printf("\t -----------------------------------------------------------------------------------------------\n");
 
-    for(int i = 0; i < lengthArray; i++){
+    for(int i = 0; i < lengthMedicineArray; i++){
         if(fromUpdate){
             if(medicineArray[i].amount < 3){
                 printf("\t|\t%d\t\t|\t%s    \t|\t%d\t\t|\t%.2f   DH\t|\n", medicineArray[i].id, medicineArray[i].name, medicineArray[i].amount, medicineArray[i].price);
@@ -188,7 +212,7 @@ int showMedicines(){
 }
 
 int isExistById(int id){
-    for(int i = 0; i < lengthArray; i++){
+    for(int i = 0; i < lengthMedicineArray; i++){
         if(id == medicineArray[i].id){
             showSingleMedicine(medicineArray[i]);
             return i;
@@ -198,9 +222,9 @@ int isExistById(int id){
     return -1;
 }
 
-int isExistByName(char name[20]){
+int isExistByName(char name[LENGTH_NAME]){
     toUpperCase(name);
-    for(int i = 0; i < lengthArray; i++){
+    for(int i = 0; i < lengthMedicineArray; i++){
         if(strcmp(name, medicineArray[i].name) == 0){
             showSingleMedicine(medicineArray[i]);
             return i;
@@ -243,8 +267,8 @@ int addMedicine(){
             scanf("%f", &medicine.price);
             medicine.price += (medicine.price * 0.15);
 
-            medicineArray[lengthArray] = medicine;
-            ++lengthArray;
+            medicineArray[lengthMedicineArray] = medicine;
+            ++lengthMedicineArray;
 
             medicineArrayToFile();
         }
@@ -256,7 +280,7 @@ int addMedicine(){
 void searchMedicine(){
     int searchChoice;
     int index;
-    char searchName[20];
+    char searchName[LENGTH_NAME];
     int searchId;
 
     do{
@@ -304,10 +328,10 @@ int deleteMedicine(){
     index = isExistById(deleteId);
 
     if(index != -1){
-        for(int i = index; i < lengthArray; i++){
+        for(int i = index; i < lengthMedicineArray; i++){
             medicineArray[i] = medicineArray[i + 1];
         }
-        --lengthArray;
+        --lengthMedicineArray;
 
         medicineArrayToFile();
     }else{
@@ -354,6 +378,8 @@ int updateMedicine(){
 int buyMedicine(){
     int buyId, buyAmount, index;
     char date[50];
+    char dateForCompare[50];
+    struct tm * buyTime;
 
     showListMedicines(false);
 
@@ -375,17 +401,7 @@ int buyMedicine(){
             printf("\t\t\t\t\tSorry! We don't have that amount of this Medicine.\t\t\t\t\t\n");
             printf("\t -----------------------------------------------------------------------------------------------\n\n\n\n");
         }else{
-            if(totalProducts == 0){
-                min = index;
-                max = index;
-            }else{
-                if(medicineArray[min].price > medicineArray[index].price){
-                    min = index;
-                }
-                if(medicineArray[max].price < medicineArray[index].price){
-                    max = index;
-                }
-            }
+            
             totalPrice += (medicineArray[index].price * buyAmount);
             totalProducts += buyAmount;
             medicineArray[index].amount -= buyAmount;
@@ -395,15 +411,27 @@ int buyMedicine(){
             transaction.idMedicine = medicineArray[index].id;
             strcpy(transaction.nameMedicine , medicineArray[index].name);
             transaction.amountMedicineBuying = buyAmount;
+            transaction.unitPriceMedicine = medicineArray[index].price;
             transaction.priceMedicineBuying = (medicineArray[index].price * buyAmount);
             time_t  t = time(NULL);
             strcpy(date, ctime(&t));
-            date[3] = '_';
-            date[7] = '_';
-            date[10] = '_';
-            date[19] = '_';
+
+            time(&t);
+            buyTime = localtime(&t);
+            strftime(dateForCompare, 80, "%x ", buyTime);
+
+            strcpy(transaction.timeToCompare , dateForCompare);
             strcpy(transaction.buyTime , date);
             transactionArray[lengthTransactionArray] = transaction;
+
+            //
+            if(max.unitPriceMedicine < transaction.unitPriceMedicine){
+                max = transaction;
+            }
+            if(min.unitPriceMedicine > transaction.unitPriceMedicine){
+                min = transaction;
+            }
+
             lengthTransactionArray++;
             system("cls");
 
@@ -423,23 +451,23 @@ void dashboard(){
     printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
     printf("\t|\tSum Medicine Sold\t|\tMoyen Medicine Sold\t|\tMax Medicine Sold\t|\tMin Medicine Sold\t|\n");
     printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
-    printf("\t|\t%.2f   DH\t\t|\t%.2f   DH\t\t|\t%.2f   DH\t\t|\t%.2f   DH\t\t|\n", totalPrice, moyen, medicineArray[max].price, medicineArray[min].price);
-    printf("\t ---------------------------------------------------------------|\t%s\t\t|\t%s\t\t|\n", medicineArray[max].name, medicineArray[min].name);
+    printf("\t|\t%.2f   DH\t\t|\t%.2f   DH\t\t|\t%.2f   DH\t\t|\t%.2f   DH\t\t|\n", totalPrice, moyen, max.unitPriceMedicine, min.unitPriceMedicine);
+    printf("\t ---------------------------------------------------------------|\t%s\t\t|\t%s\t\t|\n", max.nameMedicine, min.nameMedicine);
     printf("\t                                                                 ---------------------------------------------------------------\n\n\n");
 
     printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
-    printf("\t|\tN\t|\tID\t|\tMedicine Name\t|\tAmount\t|\tPrice Total\t|\tTransaction Date\t|\n");
+    printf("\t|\tN\t|\tID\t|\tMedicine Name\t|\tAmount\t|\tUnit Price\t|\tPrice Total\t|\tTransaction Date\t|\n");
     printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
 
     for(int i = 0; i < lengthTransactionArray; i++){
-        printf("\t|\t%d\t|\t%d\t|\t%s    \t|\t%d\t|\t%.2f   DH\t|  %s\n", i + 1, transactionArray[i].idMedicine, transactionArray[i].nameMedicine, transactionArray[i].amountMedicineBuying, transactionArray[i].priceMedicineBuying, transactionArray[i].buyTime);
+        printf("\t|\t%d\t|\t%d\t|\t%s    \t|\t%d\t|\t%.2f   DH\t|\t%.2f   DH\t|  %s\n", i + 1, transactionArray[i].idMedicine, transactionArray[i].nameMedicine, transactionArray[i].amountMedicineBuying, transactionArray[i].unitPriceMedicine, transactionArray[i].priceMedicineBuying, transactionArray[i].buyTime);
     }
 
     printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
 }
 
 void menu(){
-    char choice[20];
+    char choice[LENGTH_NAME];
     
     do{
         printf("\t -------------------------------------------------------\t\n");
