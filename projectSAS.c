@@ -34,20 +34,17 @@ struct Transaction max;
 struct Transaction min;
 int lengthTransactionArray;
 int lengthMedicineArray;
-struct Transaction transactionArray[100];
-struct Medicine medicineArray[100];
-
 
 
 /* Files */
 // this function to write the array medicines into file
-void medicineArrayToFile(){
+void medicineArrayToFile(struct Medicine * medicineArray){
     FILE* file = NULL;
 
     file = fopen("Medicines.txt", "w");
     if (file != NULL){
         for(int i = 0; i < lengthMedicineArray; i++){
-            fprintf(file, "%d\t%s\t\t\t%d\t%.2f\n", medicineArray[i].id, medicineArray[i].name, medicineArray[i].amount, medicineArray[i].price); 
+            fprintf(file, "%d\t%s\t\t\t%d\t%.2f\n", (medicineArray+i)->id, (medicineArray+i)->name, (medicineArray+i)->amount, (medicineArray+i)->price); 
         }
     }else{
         printf("\t -----------------------------------------------------------------------------------------------\n");
@@ -58,13 +55,13 @@ void medicineArrayToFile(){
     fclose(file); 
 }
 // this function to write the array transaction into file
-void transactionArrayToFile(){
+void transactionArrayToFile(struct Transaction * transactionArray){
     FILE* file = NULL;
 
     file = fopen("Transactions.txt", "w");
     if (file != NULL){
         for(int i = 0; i < lengthTransactionArray; i++){
-            fprintf(file, "%d\t%s\t\t%d\t%.2f\t%.2f\t%s %s\n", transactionArray[i].idMedicine, transactionArray[i].nameMedicine, transactionArray[i].amountMedicineBuying, transactionArray[i].unitPriceMedicine,transactionArray[i].priceMedicineBuying, transactionArray[i].timeToCompare, transactionArray[i].buyTime); 
+            fprintf(file, "%d\t%s\t\t%d\t%.2f\t%.2f\t%s %s\n", (transactionArray+i)->idMedicine, (transactionArray+i)->nameMedicine, (transactionArray+i)->amountMedicineBuying, (transactionArray+i)->unitPriceMedicine,(transactionArray+i)->priceMedicineBuying, (transactionArray+i)->timeToCompare, (transactionArray+i)->buyTime); 
         }
     }else{
         printf("\t -----------------------------------------------------------------------------------------------\n");
@@ -75,13 +72,13 @@ void transactionArrayToFile(){
     fclose(file); 
 }
 // this function to read the informations from file to array medicines
-void readMedicineArray(){
+void readMedicineArray(struct Medicine * medicineArray){
     lengthMedicineArray = 0;
     FILE* file = NULL;
 
     file = fopen("Medicines.txt", "r");
     if (file != NULL){
-        while(fscanf(file, "%d\t%s\t\t\t%d\t%f", &medicineArray[lengthMedicineArray].id, &medicineArray[lengthMedicineArray].name, &medicineArray[lengthMedicineArray].amount, &medicineArray[lengthMedicineArray].price) != -1){
+        while(fscanf(file, "%d\t%s\t\t\t%d\t%f", &(medicineArray+lengthMedicineArray)->id, &(medicineArray+lengthMedicineArray)->name, &(medicineArray+lengthMedicineArray)->amount, &(medicineArray+lengthMedicineArray)->price) != -1){
             lengthMedicineArray++;
         }
     }else{
@@ -93,7 +90,7 @@ void readMedicineArray(){
     fclose(file); 
 }
 // this function to read the informations from file to array transaction
-void readTransactionArray(){
+void readTransactionArray(struct Transaction * transactionArray){
     lengthTransactionArray = 0;
     char date[50];
 
@@ -107,19 +104,19 @@ void readTransactionArray(){
 
     file = fopen("Transactions.txt", "r");
     if (file != NULL){
-        while(fscanf(file, "%d\t%s\t\t%d\t%f\t%f\t%s %[^\n]", &transactionArray[lengthTransactionArray].idMedicine, &transactionArray[lengthTransactionArray].nameMedicine, &transactionArray[lengthTransactionArray].amountMedicineBuying, &transactionArray[lengthTransactionArray].unitPriceMedicine, &transactionArray[lengthTransactionArray].priceMedicineBuying, &transactionArray[lengthTransactionArray].timeToCompare, &transactionArray[lengthTransactionArray].buyTime) != -1){
-            if(strcmp(transactionArray[lengthTransactionArray].timeToCompare, date) == 0){
-                if(max.unitPriceMedicine < transactionArray[lengthTransactionArray].unitPriceMedicine){
+        while(fscanf(file, "%d\t%s\t\t%d\t%f\t%f\t%s %[^\n]", &(transactionArray+lengthTransactionArray)->idMedicine, &(transactionArray+lengthTransactionArray)->nameMedicine, &(transactionArray+lengthTransactionArray)->amountMedicineBuying, &(transactionArray+lengthTransactionArray)->unitPriceMedicine, &(transactionArray+lengthTransactionArray)->priceMedicineBuying, &(transactionArray+lengthTransactionArray)->timeToCompare, &(transactionArray+lengthTransactionArray)->buyTime) != -1){
+            if(strcmp((transactionArray+lengthTransactionArray)->timeToCompare, date) == 0){
+                if(max.unitPriceMedicine < (transactionArray+lengthTransactionArray)->unitPriceMedicine){
                     max = transactionArray[lengthTransactionArray];
                     if(lengthTransactionArray == 0){
                         min = transactionArray[lengthTransactionArray];
                     }
                 }
-                if(min.unitPriceMedicine > transactionArray[lengthTransactionArray].unitPriceMedicine){
+                if(min.unitPriceMedicine > (transactionArray+lengthTransactionArray)->unitPriceMedicine){
                     min = transactionArray[lengthTransactionArray];
                 }
-                totalPrice += transactionArray[lengthTransactionArray].priceMedicineBuying;
-                totalProducts += transactionArray[lengthTransactionArray].amountMedicineBuying;
+                totalPrice += (transactionArray+lengthTransactionArray)->priceMedicineBuying;
+                totalProducts += (transactionArray+lengthTransactionArray)->amountMedicineBuying;
                 lengthTransactionArray++;
             }
         }
@@ -135,12 +132,12 @@ void readTransactionArray(){
 
 /* Functions */
 // this function for sort the array medicines by alphabet
-void sortByAlphabet(){
+void sortByAlphabet(struct Medicine * medicineArray){
     struct Medicine help;
 
     for(int i = 0; i < lengthMedicineArray; i++){
         for(int j = i + 1; j < lengthMedicineArray; j++){
-            if(strcmp(medicineArray[i].name, medicineArray[j].name) > 0 ){
+            if(strcmp((medicineArray+i)->name, medicineArray[j].name) > 0 ){
                 help = medicineArray[i];
                 medicineArray[i] = medicineArray[j];
                 medicineArray[j] = help;
@@ -149,12 +146,12 @@ void sortByAlphabet(){
     }
 }
 // this function for sort the array medicines by price
-void sortByPrice(){
+void sortByPrice(struct Medicine * medicineArray){
     struct Medicine help;
 
     for(int i = 0; i < lengthMedicineArray; i++){
         for(int j = i + 1; j < lengthMedicineArray; j++){
-            if(medicineArray[i].price < medicineArray[j].price){
+            if((medicineArray+i)->price < medicineArray[j].price){
                 help = medicineArray[i];
                 medicineArray[i] = medicineArray[j];
                 medicineArray[j] = help;
@@ -177,19 +174,19 @@ void showSingleMedicine(struct Medicine medicine){
     printf("\t -----------------------------------------------------------------------------------------------\n\n\n\n");
 }
 // this function for show the list of all medicines
-void showListMedicines(bool fromUpdate){
+void showListMedicines(bool fromUpdate, struct Medicine * medicineArray){
     printf("\n\n\t -----------------------------------------------------------------------------------------------\n");
     printf("\t|\tMedicine ID\t|\tMedicine Name\t|\tMedicine Amount\t|\tMedicine Price\t|\n");
     printf("\t -----------------------------------------------------------------------------------------------\n");
 
     for(int i = 0; i < lengthMedicineArray; i++){
         if(fromUpdate){
-            if(medicineArray[i].amount < 3){
-                printf("\t|\t%d\t\t|\t%-10s\t|\t%d\t\t|\t%.2f   DH\t|\n", medicineArray[i].id, medicineArray[i].name, medicineArray[i].amount, medicineArray[i].price);
+            if((medicineArray+i)->amount < 3){
+                printf("\t|\t%d\t\t|\t%-10s\t|\t%d\t\t|\t%.2f   DH\t|\n", (medicineArray+i)->id, (medicineArray+i)->name, (medicineArray+i)->amount, (medicineArray+i)->price);
             }
         }else{
-            if(medicineArray[i].amount != 0){
-                printf("\t|\t%d\t\t|\t%-10s\t|\t%d\t\t|\t%.2f   DH\t|\n", medicineArray[i].id, medicineArray[i].name, medicineArray[i].amount, medicineArray[i].price);
+            if((medicineArray+i)->amount != 0){
+                printf("\t|\t%d\t\t|\t%-10s\t|\t%d\t\t|\t%.2f   DH\t|\n", (medicineArray+i)->id, (medicineArray+i)->name, (medicineArray+i)->amount, (medicineArray+i)->price);
             }
         }
     }
@@ -197,7 +194,7 @@ void showListMedicines(bool fromUpdate){
     printf("\t -----------------------------------------------------------------------------------------------\n\n\n\n");
 }
 
-int showMedicines(){
+int showMedicines(struct Medicine * medicineArray){
     int sortChoice;
 
     do{
@@ -209,19 +206,19 @@ int showMedicines(){
         system("cls");
         switch(sortChoice){
             case 0: return 0;
-            case 1: sortByAlphabet(); break;
-            case 2: sortByPrice(); break;
+            case 1: sortByAlphabet(medicineArray); break;
+            case 2: sortByPrice(medicineArray); break;
             default : printf("\n\t\t===> PLEASE ENTER VALID CHOICE!!! <===\n\n");
         }
     }while(sortChoice < 0 || sortChoice > 2);
  
-    showListMedicines(false);
+    showListMedicines(false, medicineArray);
 }
 // this function for check a medicine is exist by id, return the index if exist or -1 if not
-int isExistById(int id){
+int isExistById(int id, struct Medicine * medicineArray){
     for(int i = 0; i < lengthMedicineArray; i++){
-        if(id == medicineArray[i].id){
-            showSingleMedicine(medicineArray[i]);
+        if(id == (medicineArray+i)->id){
+            showSingleMedicine(*(medicineArray+i));
             return i;
         }
     }
@@ -229,11 +226,11 @@ int isExistById(int id){
     return -1;
 }
 // this function for check a medicine is exist by name, return the index if exist or -1 if not
-int isExistByName(char name[LENGTH_NAME]){
+int isExistByName(char name[LENGTH_NAME], struct Medicine * medicineArray){
     toUpperCase(name);
     for(int i = 0; i < lengthMedicineArray; i++){
-        if(strcmp(name, medicineArray[i].name) == 0){
-            showSingleMedicine(medicineArray[i]);
+        if(strcmp(name, (medicineArray+i)->name) == 0){
+            showSingleMedicine(*(medicineArray+i));
             return i;
         }
     }
@@ -241,7 +238,7 @@ int isExistByName(char name[LENGTH_NAME]){
     return -1;
 }
 // this function for add single or multiple medicines
-int addMedicine(){
+int addMedicine(struct Medicine * medicineArray){
     int numbers;
     printf("\t[0] ===> Return to Menu \n\n");
     printf("\tHow many medicine do you want add : ");
@@ -259,7 +256,7 @@ int addMedicine(){
         printf("\tMedicine ID : ");
         scanf("%d", &medicine.id);
 
-        if(isExistById(medicine.id) != -1){
+        if(isExistById(medicine.id, medicineArray) != -1){
             printf("\t -----------------------------------------------------------------------------------------------\n");
             printf("\t\t\t\t\tAlready Exist!!!.\t\t\t\t\t\n");
             printf("\t -----------------------------------------------------------------------------------------------\n\n\n\n");
@@ -277,15 +274,15 @@ int addMedicine(){
             medicineArray[lengthMedicineArray] = medicine;
             ++lengthMedicineArray;
 
-            medicineArrayToFile();
-            readMedicineArray();
+            medicineArrayToFile(medicineArray);
+            readMedicineArray(medicineArray);
         }
     }
 
-    showListMedicines(false);
+    showListMedicines(false, medicineArray);
 }
 
-void searchMedicine(){
+void searchMedicine(struct Medicine * medicineArray){
     int searchChoice;
     int index;
     char searchName[LENGTH_NAME];
@@ -303,12 +300,12 @@ void searchMedicine(){
             case 1: 
                 printf("\tEnter the Name of medicine you want : ");
                 scanf("%s", &searchName);
-                index = isExistByName(searchName);
+                index = isExistByName(searchName, medicineArray);
                 break;
             case 2: 
                 printf("\tEnter the ID of medicine you want : ");
                 scanf("%d", &searchId);
-                index = isExistById(searchId);
+                index = isExistById(searchId, medicineArray);
                 break;
             default : printf("\n\t\t===> PLEASE ENTER VALID CHOICE!!! <===\n\n");
         }
@@ -320,10 +317,10 @@ void searchMedicine(){
     }while(searchChoice < 0 || searchChoice > 2);
 }
 // this function for delete a medicine, i check if exist first & delete by the index
-int deleteMedicine(){
+int deleteMedicine(struct Medicine * medicineArray){
     int deleteId, index;
 
-    showListMedicines(false);
+    showListMedicines(false, medicineArray);
 
     printf("\t[0] ===> Return to Menu \n\n");
     printf("\tEnter the ID of medicine you want Delete : ");
@@ -333,7 +330,7 @@ int deleteMedicine(){
         return 0;
     }
 
-    index = isExistById(deleteId);
+    index = isExistById(deleteId, medicineArray);
 
     if(index != -1){
         for(int i = index; i < lengthMedicineArray; i++){
@@ -341,10 +338,10 @@ int deleteMedicine(){
         }
         --lengthMedicineArray;
 
-        medicineArrayToFile();
-        readMedicineArray();
+        medicineArrayToFile(medicineArray);
+        readMedicineArray(medicineArray);
 
-        showListMedicines(false);
+        showListMedicines(false, medicineArray);
     }else{
         printf("\t -----------------------------------------------------------------------------------------------\n");
         printf("\t\t\t\t\tSorry! We don't have this Medicine.\t\t\t\t\t\n");
@@ -352,10 +349,10 @@ int deleteMedicine(){
     }
 }
 // this function for update the medicines less than 3 in the amount
-int updateMedicine(){
+int updateMedicine(struct Medicine * medicineArray){
     int updateId, updateAmount, index;
 
-    showListMedicines(true);
+    showListMedicines(true, medicineArray);
 
     printf("\t[0] ===> Return to Menu \n\n");
     printf("\tEnter the ID of medicine you want Update : ");
@@ -365,7 +362,7 @@ int updateMedicine(){
         return 0;
     }
 
-    index = isExistById(updateId);
+    index = isExistById(updateId, medicineArray);
 
     if(index != -1){
         printf("\tEnter the amount you want add : ");
@@ -373,8 +370,8 @@ int updateMedicine(){
         if(updateAmount > 0){
             medicineArray[index].amount += updateAmount;
 
-            medicineArrayToFile();
-            readMedicineArray();
+            medicineArrayToFile(medicineArray);
+            readMedicineArray(medicineArray);
         }else{
             printf("\t -----------------------------------------------------------------------------------------------\n");
             printf("\t\t\t\t\tDon't Play with Me !!!.\t\t\t\t\t\n");
@@ -387,13 +384,13 @@ int updateMedicine(){
     }
 }
 // this function for buy a medicine & here save the transaction array
-int buyMedicine(){
+int buyMedicine(struct Transaction * transactionArray, struct Medicine * medicineArray){
     int buyId, buyAmount, index;
     char date[50];
     char dateForCompare[50];
     struct tm * buyTime;
 
-    showListMedicines(false);
+    showListMedicines(false, medicineArray);
 
     printf("\t[0] ===> Return to Menu \n\n");
     printf("\tEnter the ID of medicine you want Buy : ");
@@ -403,7 +400,7 @@ int buyMedicine(){
         return 0;
     }
 
-    index = isExistById(buyId);
+    index = isExistById(buyId, medicineArray);
 
     if(index != -1){
         printf("\tEnter the amount you want Buy : ");
@@ -436,16 +433,16 @@ int buyMedicine(){
 
             strcpy(transaction.timeToCompare , dateForCompare);
             strcpy(transaction.buyTime , date);
-            transactionArray[lengthTransactionArray] = transaction;
+            *(transactionArray+lengthTransactionArray) = transaction;
 
             lengthTransactionArray++;
             system("cls");
 
             // here sync with files
-            medicineArrayToFile();
-            transactionArrayToFile();
-            readMedicineArray();
-            readTransactionArray();
+            medicineArrayToFile(medicineArray);
+            transactionArrayToFile(transactionArray);
+            readMedicineArray(medicineArray);
+            readTransactionArray(transactionArray);
         }
     }else{
         printf("\t -----------------------------------------------------------------------------------------------\n");
@@ -454,7 +451,7 @@ int buyMedicine(){
     }
 }
 // this function for show the statistics | total price | Moyen | max | min
-void dashboard(){
+void dashboard(struct Transaction * transactionArray, struct Medicine * medicineArray){
     float moyen = totalProducts != 0 ? (totalPrice / totalProducts) : 0;
     system("cls");
     printf("\n\t -------------------------------------------------------------------------------------------------------------------------------\n");
@@ -469,13 +466,13 @@ void dashboard(){
     printf("\t -------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 
     for(int i = 0; i < lengthTransactionArray; i++){
-        printf("\t|\t%d\t|\t%d\t|\t%-10s\t|\t%d\t|\t%.2f   DH\t|\t%.2f   DH\t|  %s\n", i + 1, transactionArray[i].idMedicine, transactionArray[i].nameMedicine, transactionArray[i].amountMedicineBuying, transactionArray[i].unitPriceMedicine, transactionArray[i].priceMedicineBuying, transactionArray[i].buyTime);
+        printf("\t|\t%d\t|\t%d\t|\t%-10s\t|\t%d\t|\t%.2f   DH\t|\t%.2f   DH\t|  %s\n", i + 1, (transactionArray+i)->idMedicine, (transactionArray+i)->nameMedicine, (transactionArray+i)->amountMedicineBuying, (transactionArray+i)->unitPriceMedicine, (transactionArray+i)->priceMedicineBuying, (transactionArray+i)->buyTime);
     }
 
     printf("\t -------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n");
 }
 
-void menu(){
+void menu(struct Transaction * transactionArray, struct Medicine * medicineArray){
     char choice[LENGTH_NAME];
     
     do{
@@ -496,21 +493,23 @@ void menu(){
         system("cls");
         switch(atoi(choice)){
             case 0: break;
-            case 1: showMedicines(); break;
-            case 2: addMedicine(); break;
-            case 3: updateMedicine(); break;
-            case 4: searchMedicine(); break;
-            case 5: deleteMedicine(); break;
-            case 6: buyMedicine(); break;
-            case 7: dashboard(); break;
+            case 1: showMedicines(medicineArray); break;
+            case 2: addMedicine(medicineArray); break;
+            case 3: updateMedicine(medicineArray); break;
+            case 4: searchMedicine(medicineArray); break;
+            case 5: deleteMedicine(medicineArray); break;
+            case 6: buyMedicine(transactionArray, medicineArray); break;
+            case 7: dashboard(transactionArray, medicineArray); break;
             default : printf("\n\t\t===> PLEASE ENTER VALID CHOICE!!! <===\n\n");
         }
     }while(atoi(choice) != 0);
 }
 
 void main(){
+    struct Transaction transactionArray[100];
+    struct Medicine medicineArray[100];
     printf("\n\n\n=========================> GESTION DE PHARMACIE <=========================\n\n\n\n");
-    readMedicineArray();
-    readTransactionArray();
-    menu();
+    readMedicineArray(medicineArray);
+    readTransactionArray(transactionArray);
+    menu(transactionArray, medicineArray);
 }
