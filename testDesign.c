@@ -35,6 +35,9 @@ char * date(char * n){
 }
 
 void main(){
+printf("\t -------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+    printf("\t|\tN\t|\tID\t|\tMedicine Name\t|\tAmount\t|\tUnit Price\t|\tPrice Total\t|\tTransaction Date\t|\n");
+    printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
     // char time[50];
     // time_t  t = time(NULL);
     // strcpy(name, ctime(&t));
@@ -43,7 +46,7 @@ void main(){
     // name[10] = '_';
     // name[19] = '_';
     // printf("%s", time);
-    struct Medicine medicine;
+    // struct Medicine medicine;
 
 
     // FILE* fichierr = NULL;
@@ -57,18 +60,18 @@ void main(){
     
     // fclose(fichierr); // On ferme le fichier qui a été ouvert   
 
-    FILE* fichier = NULL;
+    // FILE* fichier = NULL;
 
-    fichier = fopen("test.txt", "r");
+    // fichier = fopen("test.txt", "r");
  
     
-        if (fichier != NULL)
-        {
-            while(fscanf(fichier, "%d\t%s\t\t\t%d\t%f", &medicine.id, &medicine.name, &medicine.amount, &medicine.price) != -1)
-                printf("%d--%s--%d--%.2f\n", medicine.id, medicine.name, medicine.amount, medicine.price); 
+    //     if (fichier != NULL)
+    //     {
+    //         while(fscanf(fichier, "%d\t%s\t\t\t%d\t%f", &medicine.id, &medicine.name, &medicine.amount, &medicine.price) != -1)
+    //             printf("%d--%s--%d--%.2f\n", medicine.id, medicine.name, medicine.amount, medicine.price); 
             
-        }
+    //     }
     
     
-    fclose(fichier); // On ferme le fichier qui a été ouvert
+    // fclose(fichier); // On ferme le fichier qui a été ouvert
 }   

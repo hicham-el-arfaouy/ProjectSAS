@@ -74,6 +74,7 @@ void transactionArrayToFile(){
 }
 
 void readMedicineArray(){
+    lengthMedicineArray = 0;
     FILE* file = NULL;
 
     file = fopen("Medicines.txt", "r");
@@ -91,6 +92,7 @@ void readMedicineArray(){
 }
 
 void readTransactionArray(){
+    lengthTransactionArray = 0;
     char date[50];
     min.unitPriceMedicine = 9*9*9*9;
 
@@ -265,12 +267,13 @@ int addMedicine(){
             scanf("%d", &medicine.amount);
             printf("Medicine Price : ");
             scanf("%f", &medicine.price);
-            medicine.price += (medicine.price * 0.15);
+            medicine.price *= 1.15;
 
             medicineArray[lengthMedicineArray] = medicine;
             ++lengthMedicineArray;
 
             medicineArrayToFile();
+            readMedicineArray();
         }
     }
 
@@ -334,6 +337,7 @@ int deleteMedicine(){
         --lengthMedicineArray;
 
         medicineArrayToFile();
+        readMedicineArray();
     }else{
         printf("\t -----------------------------------------------------------------------------------------------\n");
         printf("\t\t\t\t\tSorry! We don't have this Medicine.\t\t\t\t\t\n");
@@ -363,6 +367,7 @@ int updateMedicine(){
             medicineArray[index].amount += updateAmount;
 
             medicineArrayToFile();
+            readMedicineArray();
         }else{
             printf("\t -----------------------------------------------------------------------------------------------\n");
             printf("\t\t\t\t\tDon't Play with Me !!!.\t\t\t\t\t\n");
@@ -424,19 +429,13 @@ int buyMedicine(){
             strcpy(transaction.buyTime , date);
             transactionArray[lengthTransactionArray] = transaction;
 
-            //
-            if(max.unitPriceMedicine < transaction.unitPriceMedicine){
-                max = transaction;
-            }
-            if(min.unitPriceMedicine > transaction.unitPriceMedicine){
-                min = transaction;
-            }
-
             lengthTransactionArray++;
             system("cls");
 
             medicineArrayToFile();
             transactionArrayToFile();
+            readMedicineArray();
+            readTransactionArray();
         }
     }else{
         printf("\t -----------------------------------------------------------------------------------------------\n");
@@ -455,15 +454,15 @@ void dashboard(){
     printf("\t ---------------------------------------------------------------|\t%s\t\t|\t%s\t\t|\n", max.nameMedicine, min.nameMedicine);
     printf("\t                                                                 ---------------------------------------------------------------\n\n\n");
 
-    printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
+    printf("\t -------------------------------------------------------------------------------------------------------------------------------------------------------\n");
     printf("\t|\tN\t|\tID\t|\tMedicine Name\t|\tAmount\t|\tUnit Price\t|\tPrice Total\t|\tTransaction Date\t|\n");
-    printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
+    printf("\t -------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 
     for(int i = 0; i < lengthTransactionArray; i++){
         printf("\t|\t%d\t|\t%d\t|\t%s    \t|\t%d\t|\t%.2f   DH\t|\t%.2f   DH\t|  %s\n", i + 1, transactionArray[i].idMedicine, transactionArray[i].nameMedicine, transactionArray[i].amountMedicineBuying, transactionArray[i].unitPriceMedicine, transactionArray[i].priceMedicineBuying, transactionArray[i].buyTime);
     }
 
-    printf("\t -------------------------------------------------------------------------------------------------------------------------------\n");
+    printf("\t -------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 }
 
 void menu(){
@@ -500,6 +499,7 @@ void menu(){
 }
 
 void main(){
+    printf("\n\n\n=========================> GESTION DE PHARMACIE <=========================\n\n\n\n");
     readMedicineArray();
     readTransactionArray();
     menu();
